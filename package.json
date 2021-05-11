@@ -1,0 +1,11 @@
+{
+  "name": "handy-man",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "chai": "^4.3.4",
+    "chalk": "^4.1.1",
+    "mocha": "^8.4.0"
+  }
+}
