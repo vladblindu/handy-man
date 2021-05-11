@@ -1,8 +1,8 @@
 const {join, resolve} = require('path')
 const {existsSync} = require('fs')
-const {readJson} = require('./json')
+const {readJson, getPackage} = require('./json')
 const {throwErr} = require('../console')
-const {PKG} = require('../constants')
+const {PKG, WORKSPACES_KEY} = require('../constants')
 
 /**
  * @description determines if a path is the file system root on both nix and windows systems
@@ -21,7 +21,7 @@ const isFsRoot = root => root === '/'|| /^[A-Z]:\/$/.test(root)
 const fileSeek = ( fileName, key, root) => {
     root = root || process.cwd()
     while (!isFsRoot(root)) {
-        const pth = join(root, fileName || PKG)
+        const pth = join(root, fileName)
         if (existsSync(pth)) {
             const obj = readJson(pth)
             if (!key || obj[key]) return [obj, root]
@@ -34,9 +34,31 @@ const fileSeek = ( fileName, key, root) => {
     )
 }
 
+const findWsPkg = root => {
+    return fileSeek(PKG, WORKSPACES_KEY, root)
+}
+
+/**
+ *
+ * @param {string} pkgName
+ * @param {object} opts
+ * @param {string} opts.cfgFile
+ * @param {string} opts.wsMapKey
+ * @param {string} opts.wsIgnoreKey
+ */
+const findPkg = (pkgName, opts = {}) => {
+    if(!pkgName) return fileSeek(PKG)
+    const [, wsRoot]  = fileSeek(PKG, WORKSPACES_KEY)
+    const cfg = readJson(join(wsRoot, opts.cfgFile), 'utf8')
+    if(!cfg[opts.wsMapKey])
+        throwErr(`No ${opts.cfgFile} found in ${wsRoot}.`)
+    const pkgPth = join(wsRoot,cfg[opts.wsMapKey][pkgName])
+    return [getPackage(pkgPth), cfg[opts.wsMapKey][pkgName]]
+}
+
 module.exports = {
     isFsRoot,
-    fileSeek
+    fileSeek,
+    findWsPkg,
+    findPkg
 }
-//Users/vlad/Documents/zecode/@lib/handy-man/test/__fixtures__/file-system/test.json
-//Users/vlad/Documents/zecode/@lib/handy-man/test/__fixtures__/file-system/test.json

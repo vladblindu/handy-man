@@ -17,6 +17,10 @@ const ENV = '.env'
 const PNG_EXT = '.png'
 const JSON_EXT = '.json'
 
+
+// keys
+const WORKSPACES_KEY = 'workspaces'
+
 module.exports = {
     GREEN,
     RED,
@@ -28,5 +32,6 @@ module.exports = {
     PNG_EXT,
     JSON_EXT,
     PKG,
-    ENV
+    ENV,
+    WORKSPACES_KEY
 }
